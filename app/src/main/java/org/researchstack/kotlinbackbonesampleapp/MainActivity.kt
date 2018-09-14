@@ -26,7 +26,7 @@ import org.researchstack.backbone.result.TaskResult
 import org.researchstack.backbone.step.*
 import org.researchstack.backbone.task.OrderedTask
 import org.researchstack.backbone.ui.PinCodeActivity
-import org.researchstack.backbone.ui.ViewTaskActivity
+import org.researchstack.backbone.ui.ViewTaskFragmentActivity
 import org.researchstack.backbone.ui.step.layout.ConsentSignatureStepLayout
 import java.util.ArrayList
 
@@ -153,9 +153,9 @@ class MainActivity : PinCodeActivity() {
         super.onActivityResult(requestCode, resultCode, data)
 
         if (requestCode == REQUEST_CONSENT && resultCode == Activity.RESULT_OK) {
-            processConsentResult(data.getSerializableExtra(ViewTaskActivity.EXTRA_TASK_RESULT) as TaskResult)
+            processConsentResult(data.getSerializableExtra(ViewTaskFragmentActivity.EXTRA_TASK_RESULT) as TaskResult)
         } else if (requestCode == REQUEST_SURVEY && resultCode == Activity.RESULT_OK) {
-            processSurveyResult(data.getSerializableExtra(ViewTaskActivity.EXTRA_TASK_RESULT) as TaskResult)
+            processSurveyResult(data.getSerializableExtra(ViewTaskFragmentActivity.EXTRA_TASK_RESULT) as TaskResult)
         }
     }
 
@@ -219,7 +219,7 @@ class MainActivity : PinCodeActivity() {
         signatureStep.text = getString(R.string.rsb_consent_signature_instruction)
         signatureStep.signatureDateFormat = signature.signatureDateFormatString
         signatureStep.isOptional = false
-        signatureStep.stepLayoutClass = ConsentSignatureStepLayout::class.java
+        signatureStep.setStepLayoutClass(ConsentSignatureStepLayout::class.java)
 
         // Finally, create and present a task including these steps.
         val consentTask = OrderedTask(CONSENT,
@@ -229,7 +229,7 @@ class MainActivity : PinCodeActivity() {
                 signatureStep)
 
         // Launch using hte ViewTaskActivity and make sure to listen for the activity result
-        val intent = ViewTaskActivity.newIntent(this, consentTask)
+        val intent = ViewTaskFragmentActivity.newIntent(this, consentTask)
         startActivityForResult(intent, REQUEST_CONSENT)
     }
 
@@ -307,7 +307,7 @@ class MainActivity : PinCodeActivity() {
                 booleanStep, multiStep)
 
         // Create an activity using the task and set a delegate.
-        val intent = ViewTaskActivity.newIntent(this, task)
+        val intent = ViewTaskFragmentActivity.newIntent(this, task)
         startActivityForResult(intent, REQUEST_SURVEY)
     }
 

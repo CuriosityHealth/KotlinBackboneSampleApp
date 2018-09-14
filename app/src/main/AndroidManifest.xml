@@ -23,6 +23,16 @@
             android:windowSoftInputMode="adjustResize"
             />
 
+        <activity
+            android:name="org.researchstack.backbone.ui.NewViewTaskActivity"
+            android:windowSoftInputMode="adjustResize"
+            />
+
+        <activity
+            android:name="org.researchstack.backbone.ui.ViewTaskFragmentActivity"
+            android:windowSoftInputMode="adjustResize"
+            />
+
     </application>
 
 </manifest>

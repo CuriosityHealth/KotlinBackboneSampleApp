@@ -21,6 +21,7 @@ allprojects {
         jcenter()
         maven { url "https://jitpack.io" } // for MPAndroidChard, not on jcenter yet
         maven { url "https://dl.bintray.com/researchstack/ResearchStack" }
+        mavenLocal()
     }
 }
 
