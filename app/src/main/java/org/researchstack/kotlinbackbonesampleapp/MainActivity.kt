@@ -27,6 +27,8 @@ import org.researchstack.backbone.step.*
 import org.researchstack.backbone.task.OrderedTask
 import org.researchstack.backbone.ui.PinCodeActivity
 import org.researchstack.backbone.ui.ViewTaskActivity
+import org.researchstack.backbone.ui.ViewTaskFragmentActivity
+import org.researchstack.backbone.ui.ViewTaskMultiFragmentActivity
 import org.researchstack.backbone.ui.step.layout.ConsentSignatureStepLayout
 import java.util.ArrayList
 
@@ -120,9 +122,11 @@ class MainActivity : PinCodeActivity() {
         val consentedDate = findViewById(R.id.consented_date) as TextView
         val consentedSig = findViewById(R.id.consented_signature) as ImageView
 
+        this.surveyButton!!.setEnabled(true)
+
         if (prefs.hasConsented()) {
             this.consentButton!!.setVisibility(View.GONE)
-            this.surveyButton!!.setEnabled(true)
+//            this.surveyButton!!.setEnabled(true)
 
             consentedSig.visibility = View.VISIBLE
             consentedDate.visibility = View.VISIBLE
@@ -131,7 +135,7 @@ class MainActivity : PinCodeActivity() {
             printConsentInfo(consentedDate, consentedSig)
         } else {
             this.consentButton!!.setVisibility(View.VISIBLE)
-            this.surveyButton!!.setEnabled(false)
+//            this.surveyButton!!.setEnabled(false)
 
             consentedSig.visibility = View.INVISIBLE
             consentedSig.setImageBitmap(null)
@@ -149,14 +153,17 @@ class MainActivity : PinCodeActivity() {
         }
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent) {
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
-        if (requestCode == REQUEST_CONSENT && resultCode == Activity.RESULT_OK) {
-            processConsentResult(data.getSerializableExtra(ViewTaskActivity.EXTRA_TASK_RESULT) as TaskResult)
-        } else if (requestCode == REQUEST_SURVEY && resultCode == Activity.RESULT_OK) {
-            processSurveyResult(data.getSerializableExtra(ViewTaskActivity.EXTRA_TASK_RESULT) as TaskResult)
+        data?.let {
+            if (requestCode == REQUEST_CONSENT && resultCode == Activity.RESULT_OK) {
+                processConsentResult(it.getSerializableExtra(ViewTaskMultiFragmentActivity.EXTRA_TASK_RESULT) as TaskResult)
+            } else if (requestCode == REQUEST_SURVEY && resultCode == Activity.RESULT_OK) {
+                processSurveyResult(it.getSerializableExtra(ViewTaskMultiFragmentActivity.EXTRA_TASK_RESULT) as TaskResult)
+            }
         }
+
     }
 
     // Consent stuff
@@ -229,7 +236,8 @@ class MainActivity : PinCodeActivity() {
                 signatureStep)
 
         // Launch using hte ViewTaskActivity and make sure to listen for the activity result
-        val intent = ViewTaskActivity.newIntent(this, consentTask)
+//        val intent = ViewTaskActivity.newIntent(this, consentTask)
+        val intent = ViewTaskMultiFragmentActivity.newIntent(this, consentTask)
         startActivityForResult(intent, REQUEST_CONSENT)
     }
 
@@ -307,7 +315,9 @@ class MainActivity : PinCodeActivity() {
                 booleanStep, multiStep)
 
         // Create an activity using the task and set a delegate.
-        val intent = ViewTaskActivity.newIntent(this, task)
+//        val intent = ViewTaskActivity.newIntent(this, task)
+        val intent = ViewTaskMultiFragmentActivity.newIntent(this, task)
+//        val intent = ViewTaskFragmentActivity.newIntent(this, task)
         startActivityForResult(intent, REQUEST_SURVEY)
     }
 

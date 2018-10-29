@@ -10,7 +10,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.BackboneApp">
-        <activity android:name=".MainActivity">
+        <activity android:name=".NewMainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -20,6 +20,16 @@
 
         <activity
             android:name="org.researchstack.backbone.ui.ViewTaskActivity"
+            android:windowSoftInputMode="adjustResize"
+            />
+
+        <activity
+            android:name="org.researchstack.backbone.ui.ViewTaskMultiFragmentActivity"
+            android:windowSoftInputMode="adjustResize"
+            />
+
+        <activity
+            android:name="org.researchstack.backbone.ui.ViewTaskFragmentActivity"
             android:windowSoftInputMode="adjustResize"
             />
 
