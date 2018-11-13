@@ -149,14 +149,17 @@ class MainActivity : PinCodeActivity() {
         }
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent) {
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
-        if (requestCode == REQUEST_CONSENT && resultCode == Activity.RESULT_OK) {
-            processConsentResult(data.getSerializableExtra(ViewTaskActivity.EXTRA_TASK_RESULT) as TaskResult)
-        } else if (requestCode == REQUEST_SURVEY && resultCode == Activity.RESULT_OK) {
-            processSurveyResult(data.getSerializableExtra(ViewTaskActivity.EXTRA_TASK_RESULT) as TaskResult)
+        data?.let {
+            if (requestCode == REQUEST_CONSENT && resultCode == Activity.RESULT_OK) {
+                processConsentResult(it.getSerializableExtra(ViewTaskActivity.EXTRA_TASK_RESULT) as TaskResult)
+            } else if (requestCode == REQUEST_SURVEY && resultCode == Activity.RESULT_OK) {
+                processSurveyResult(it.getSerializableExtra(ViewTaskActivity.EXTRA_TASK_RESULT) as TaskResult)
+            }
         }
+
     }
 
     // Consent stuff
