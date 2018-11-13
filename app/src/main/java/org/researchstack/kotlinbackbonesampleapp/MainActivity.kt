@@ -26,7 +26,7 @@ import org.researchstack.backbone.result.TaskResult
 import org.researchstack.backbone.step.*
 import org.researchstack.backbone.task.OrderedTask
 import org.researchstack.backbone.ui.PinCodeActivity
-import org.researchstack.backbone.ui.ViewTaskFragmentActivity
+import org.researchstack.backbone.ui.ViewTaskActivity
 import org.researchstack.backbone.ui.step.layout.ConsentSignatureStepLayout
 import java.util.ArrayList
 
@@ -153,9 +153,9 @@ class MainActivity : PinCodeActivity() {
         super.onActivityResult(requestCode, resultCode, data)
 
         if (requestCode == REQUEST_CONSENT && resultCode == Activity.RESULT_OK) {
-            processConsentResult(data.getSerializableExtra(ViewTaskFragmentActivity.EXTRA_TASK_RESULT) as TaskResult)
+            processConsentResult(data.getSerializableExtra(ViewTaskActivity.EXTRA_TASK_RESULT) as TaskResult)
         } else if (requestCode == REQUEST_SURVEY && resultCode == Activity.RESULT_OK) {
-            processSurveyResult(data.getSerializableExtra(ViewTaskFragmentActivity.EXTRA_TASK_RESULT) as TaskResult)
+            processSurveyResult(data.getSerializableExtra(ViewTaskActivity.EXTRA_TASK_RESULT) as TaskResult)
         }
     }
 
@@ -229,7 +229,7 @@ class MainActivity : PinCodeActivity() {
                 signatureStep)
 
         // Launch using hte ViewTaskActivity and make sure to listen for the activity result
-        val intent = ViewTaskFragmentActivity.newIntent(this, consentTask)
+        val intent = ViewTaskActivity.newIntent(this, consentTask)
         startActivityForResult(intent, REQUEST_CONSENT)
     }
 
@@ -307,7 +307,7 @@ class MainActivity : PinCodeActivity() {
                 booleanStep, multiStep)
 
         // Create an activity using the task and set a delegate.
-        val intent = ViewTaskFragmentActivity.newIntent(this, task)
+        val intent = ViewTaskActivity.newIntent(this, task)
         startActivityForResult(intent, REQUEST_SURVEY)
     }
 

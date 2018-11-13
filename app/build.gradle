@@ -33,7 +33,7 @@ dependencies {
 //        exclude group: "com.android.support"
 //    }
 
-    implementation 'org.researchstack:backbone:1.2.0-REARCH-PROTOTYPE'
+    implementation "org.researchstack:backbone:$research_stack_version"
     implementation 'net.zetetic:android-database-sqlcipher:3.5.4@aar'
 
     testImplementation 'junit:junit:4.12'
