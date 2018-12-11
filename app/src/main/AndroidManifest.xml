@@ -9,7 +9,7 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.BackboneApp">
+        android:theme="@style/Theme.FoundationApp">
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -19,7 +19,7 @@
         </activity>
 
         <activity
-            android:name="org.researchstack.backbone.ui.ViewTaskActivity"
+            android:name="org.researchstack.foundation.components.common.ui.activities.ViewTaskActivity"
             android:windowSoftInputMode="adjustResize"
             />
 

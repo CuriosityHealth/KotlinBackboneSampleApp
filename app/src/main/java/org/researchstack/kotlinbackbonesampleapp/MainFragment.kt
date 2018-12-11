@@ -1,27 +1,19 @@
 package org.researchstack.kotlinbackbonesampleapp
 
-import android.app.Activity
 import android.content.Context
-import android.content.Intent
 import android.graphics.BitmapFactory
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
-import android.support.v4.os.CancellationSignal
+import android.support.v4.app.Fragment
+import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.AppCompatButton
 import android.support.v7.widget.Toolbar
 import android.util.Base64
-import android.view.Menu
-import android.view.MenuItem
+import android.view.LayoutInflater
 import android.view.View
-import android.widget.Button
+import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
-import org.researchstack.feature.authentication.pincode.PasscodeAuthenticator
-import org.researchstack.feature.authentication.pincode.step.PassCodeCreationStep
-import org.researchstack.feature.authentication.pincode.ui.PasscodeAuthenticationFragment
 import org.researchstack.feature.storage.StorageAccess
-import org.researchstack.feature.storage.file.StorageAccessListener
 import org.researchstack.foundation.components.common.ui.activities.ViewTaskActivity
 import org.researchstack.feature.consent.model.ConsentDocument
 import org.researchstack.feature.consent.model.ConsentSection
@@ -36,16 +28,14 @@ import org.researchstack.foundation.components.survey.step.FormStep
 import org.researchstack.foundation.components.survey.step.InstructionStep
 import org.researchstack.foundation.components.survey.step.QuestionStep
 import org.researchstack.foundation.components.common.task.OrderedTask
-import org.researchstack.foundation.components.utils.LogExt
 import org.researchstack.foundation.core.models.result.TaskResult
+import java.util.*
 
-import java.util.ArrayList
-
-class MainActivity : AppCompatActivity(), StorageAccessListener, PasscodeAuthenticator.PresentationDelegate {
+open class MainFragment:  Fragment() {
 
     companion object {
 
-        val TAG = MainActivity.javaClass.name
+        val TAG = MainFragment.javaClass.name
         // Activity Request Codes
         val REQUEST_CONSENT = 0
         val REQUEST_SURVEY = 1
@@ -77,188 +67,60 @@ class MainActivity : AppCompatActivity(), StorageAccessListener, PasscodeAuthent
     }
 
     // Views
+    private var container: View? = null
     private var consentButton: AppCompatButton? = null
     private var surveyButton: AppCompatButton? = null
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+//    override fun onCreate(savedInstanceState: Bundle?) {
+////        super.onCreate(savedInstanceState)
+////        setContentView(R.layout.activity_main)
+////
+////        val toolbar = findViewById(R.id.toolbar) as Toolbar
+////        setSupportActionBar(toolbar)
+////        this.supportActionBar!!.setDisplayShowTitleEnabled(true)
+////
+//        this.consentButton = findViewById(R.id.consent_button) as AppCompatButton
+//        this.consentButton!!.setOnClickListener {
+//            launchConsent()
+//        }
+//
+//        this.surveyButton = findViewById(R.id.survey_button) as AppCompatButton
+//        this.surveyButton!!.setOnClickListener {
+//            launchSurvey()
+//        }
+////
+////    }
 
-        val toolbar = findViewById(R.id.toolbar) as Toolbar
-        setSupportActionBar(toolbar)
-        this.supportActionBar!!.setDisplayShowTitleEnabled(true)
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
-        this.consentButton = findViewById(R.id.consent_button) as AppCompatButton
+        this.container = inflater.inflate(R.layout.fragment_main, container, false)
+
+        val toolbar = this.container!!.findViewById(R.id.toolbar) as Toolbar?
+
+        val appCompatActivity: AppCompatActivity = this.activity as AppCompatActivity
+        appCompatActivity.setSupportActionBar(toolbar)
+        appCompatActivity.supportActionBar!!.setDisplayHomeAsUpEnabled(true)
+
+        this.consentButton = this.container!!.findViewById(R.id.consent_button) as AppCompatButton
         this.consentButton!!.setOnClickListener {
             launchConsent()
         }
 
-        this.surveyButton = findViewById(R.id.survey_button) as AppCompatButton
+        this.surveyButton = this.container!!.findViewById(R.id.survey_button) as AppCompatButton
         this.surveyButton!!.setOnClickListener {
             launchSurvey()
         }
 
-        val passcodeAuthenticator: PasscodeAuthenticator = BackboneApplication.instance!!.passcodeAuthenticator!!
-        passcodeAuthenticator.setPresentationDelegate(this)
+        return view
     }
 
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.activity_main, menu)
-        return super.onCreateOptionsMenu(menu)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (item.itemId == R.id.menu_clear) {
-            clearData()
-            Toast.makeText(this, R.string.menu_data_cleared, Toast.LENGTH_SHORT).show()
-            return true
-        } else {
-            return super.onOptionsItemSelected(item)
-        }
-    }
-
-    private fun clearData() {
-        val appPrefs = AppPrefs.getInstance(this)
-        appPrefs.setHasSurveyed(false)
-        appPrefs.setHasConsented(false)
-
-        initViews()
-    }
-
-    override fun onDataReady() {
-        this.storageAccessUnregister()
-        initViews()
-
-//        supportFragmentManager.findFragmentByTag("passcode_fragment")?.let { fragment ->
-//            supportFragmentManager.beginTransaction()
-//                    .setCustomAnimations(R.anim.rsf_slide_in_up, R.anim.rsf_slide_out_down)
-//                    .remove(fragment)
-//                    .commit()
-//        }
-    }
-
-
-    override fun onDataAuth() {
-//        this.storageAccessUnregister()
-//
-//        //TODO: Present Passcode
-//        val passcodeAuthenticator: PasscodeAuthenticator = BackboneApplication.instance!!.passcodeAuthenticator!!
-//        passcodeAuthenticator.setPresentationDelegate(this)
-//
-//        val cancelationSignal = CancellationSignal()
-//        cancelationSignal.setOnCancelListener {
-//
-//        }
-//
-//        val callback = object: PasscodeAuthenticator.PasscodeAuthenticationCallback() {
-//            override fun onAuthenticationSucceeded(result: PasscodeAuthenticator.PasscodeAuthenticationResult) {
-//                requestStorageAccess()
-//            }
-//        }
-//
-//        passcodeAuthenticator.authenticate(cancelationSignal, callback)
-
-    }
-
-    override fun presentPasscodeAuthentication(authenticator: PasscodeAuthenticator, cancel: CancellationSignal, callback: PasscodeAuthenticator.PasscodeAuthenticationCallback) {
-//        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-
-        //present pin code fragment
-
-        val frame = findViewById<View>(R.id.fragment_container)
-        frame.visibility = View.VISIBLE
-
-        val fragmentCallback = object: PasscodeAuthenticationFragment.AuthenticationCallback() {
-            override fun onAuthenticationFailed() {
-                callback.onAuthenticationFailed()
-            }
-
-            override fun onAuthenticationSucceeded() {
-                callback.onAuthenticationSucceeded(PasscodeAuthenticator.PasscodeAuthenticationResult())
-
-                supportFragmentManager.findFragmentByTag("passcode_fragment")?.let { fragment ->
-                    supportFragmentManager.beginTransaction()
-                            .setCustomAnimations(R.anim.rsf_slide_in_up, R.anim.rsf_slide_out_down)
-                            .remove(fragment)
-                            .commit()
-                }
-            }
-        }
-
-        val passcodeFragment = PasscodeAuthenticationFragment.newInstance(authenticator, fragmentCallback)
-        val transaction = supportFragmentManager.beginTransaction()
-                .replace(R.id.fragment_container, passcodeFragment, "passcode_fragment")
-                .commit()
-
-        supportFragmentManager.executePendingTransactions()
-
-//        val fragment: ViewTaskFragment = supportFragmentManager.findFragmentByTag(this.task.identifier) as ViewTaskFragment
-//        fragment.taskProvider = this
-//        fragment.stepLayoutProvider = BackwardsCompatibleStepLayoutProvider()
-//        fragment.setTaskPresenterDelegate(this)
-//        this.viewTaskFragment = fragment
-    }
-
-    override fun onDataFailed() {
-        this.storageAccessUnregister()
-    }
-
-    fun requestStorageAccess() {
-        LogExt.i(TAG, "requestStorageAccess()")
-        val storageAccess = StorageAccess.getInstance()
-        storageAccessRegister()
-        storageAccess.requestStorageAccess(this)
-    }
-
-    fun storageAccessRegister() {
-        LogExt.i(TAG, "storageAccessRegister()")
-        val storageAccess = StorageAccess.getInstance()
-        storageAccess.register(this)
-    }
-
-    fun storageAccessUnregister() {
-        LogExt.i(TAG, "storageAccessUnregister()")
-        val storageAccess = StorageAccess.getInstance()
-        storageAccess.unregister(this)
-    }
-
-    override fun onResume() {
-        super.onResume()
-
-        val storageAccess = StorageAccess.getInstance()
-        if (!storageAccess.hasPinCode(this)) {
-            this.launchPinCodeRegistration()
-        }
-
-    }
-
-    private fun launchPinCodeRegistration() {
-
-        val pinCodeStep = PassCodeCreationStep(PIN_CODE, 0)
-        pinCodeStep.title = "Create Pincode"
-        pinCodeStep.isOptional = false
-
-        // Create a task wrapping the steps.
-        val task = OrderedTask(PIN_CODE, pinCodeStep)
-
-        // Create an activity using the task and set a delegate.
-        val intent = ViewTaskActivity.newIntent(this, task)
-        startActivityForResult(intent, REQUEST_PIN_CODE)
-
-    }
-
-    private fun processPinCodeResult(result: TaskResult) {
-        val pinCode: String = result.getStepResult(PIN_CODE)!!.result as String
-        val storageAccess = StorageAccess.getInstance()
-        storageAccess.createPinCode(this, pinCode)
-    }
 
     private fun initViews() {
-        val prefs = AppPrefs.getInstance(this)
+        val prefs = AppPrefs.getInstance(this.activity as Context)
 
-        val lblConsentedDate = findViewById(R.id.consented_date_lbl) as TextView
-        val consentedDate = findViewById(R.id.consented_date) as TextView
-        val consentedSig = findViewById(R.id.consented_signature) as ImageView
+        val lblConsentedDate = this.container!!.findViewById(R.id.consented_date_lbl) as TextView
+        val consentedDate = this.container!!.findViewById(R.id.consented_date) as TextView
+        val consentedSig = this.container!!.findViewById(R.id.consented_signature) as ImageView
 
         if (prefs.hasConsented()) {
             this.consentButton!!.setVisibility(View.GONE)
@@ -279,7 +141,7 @@ class MainActivity : AppCompatActivity(), StorageAccessListener, PasscodeAuthent
             lblConsentedDate.setVisibility(View.INVISIBLE)
         }
 
-        val surveyAnswer = findViewById(R.id.survey_results) as TextView
+        val surveyAnswer = this.container!!.findViewById(R.id.survey_results) as TextView
 
         if (prefs.hasSurveyed()) {
             surveyAnswer.visibility = View.VISIBLE
@@ -289,21 +151,6 @@ class MainActivity : AppCompatActivity(), StorageAccessListener, PasscodeAuthent
         }
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-
-        data?.let {
-            if (requestCode == REQUEST_CONSENT && resultCode == Activity.RESULT_OK) {
-                processConsentResult(it.getSerializableExtra(ViewTaskActivity.EXTRA_TASK_RESULT) as TaskResult)
-            } else if (requestCode == REQUEST_SURVEY && resultCode == Activity.RESULT_OK) {
-                processSurveyResult(it.getSerializableExtra(ViewTaskActivity.EXTRA_TASK_RESULT) as TaskResult)
-            }
-            else if (requestCode == REQUEST_PIN_CODE && resultCode == Activity.RESULT_OK) {
-                processPinCodeResult(it.getSerializableExtra(ViewTaskActivity.EXTRA_TASK_RESULT) as TaskResult)
-            }
-        }
-
-    }
 
     // Consent stuff
 
@@ -319,7 +166,7 @@ class MainActivity : AppCompatActivity(), StorageAccessListener, PasscodeAuthent
         section1.content = "The content to show in learn more ..."
 
         // ...add more sections as needed, then create a visual consent step
-        val visualStep = ConsentVisualStep(VISUAL_CONSENT_IDENTIFIER)
+        val visualStep = ConsentVisualStep(MainActivity.VISUAL_CONSENT_IDENTIFIER)
         visualStep.stepTitle = R.string.rsfc_consent
         visualStep.section = section1
         visualStep.nextButtonString = getString(R.string.rsf_next)
@@ -342,12 +189,12 @@ class MainActivity : AppCompatActivity(), StorageAccessListener, PasscodeAuthent
         docBuilder.append("<div><h2> HTML Consent Doc goes here </h2></div>")
 
         // Create the Consent doc step, pass in our HTML doc
-        val documentStep = ConsentDocumentStep(CONSENT_DOC)
+        val documentStep = ConsentDocumentStep(MainActivity.CONSENT_DOC)
         documentStep.consentHTML = docBuilder.toString()
         documentStep.confirmMessage = getString(R.string.rsfc_consent_review_reason)
 
         // Create Consent form step, to get users first & last name
-        val formStep = FormStep(SIGNATURE_FORM_STEP,
+        val formStep = FormStep(MainActivity.SIGNATURE_FORM_STEP,
                 "Form Title",
                 "Form step description")
         formStep.stepTitle = R.string.rsfc_consent
@@ -355,11 +202,11 @@ class MainActivity : AppCompatActivity(), StorageAccessListener, PasscodeAuthent
         val format = TextAnswerFormat()
         format.setIsMultipleLines(false)
 
-        val fullName = QuestionStep(NAME, "Full name", format)
+        val fullName = QuestionStep(MainActivity.NAME, "Full name", format)
         formStep.formSteps = listOf(fullName)
 
         // Create Consent signature step, user can sign their name
-        val signatureStep = ConsentSignatureStep(SIGNATURE)
+        val signatureStep = ConsentSignatureStep(MainActivity.SIGNATURE)
         signatureStep.stepTitle = R.string.rsfc_consent
         signatureStep.title = getString(R.string.rsfc_consent_signature_title)
         signatureStep.text = getString(R.string.rsfc_consent_signature_instruction)
@@ -368,24 +215,24 @@ class MainActivity : AppCompatActivity(), StorageAccessListener, PasscodeAuthent
         signatureStep.setStepLayoutClass(ConsentSignatureStepLayout::class.java)
 
         // Finally, create and present a task including these steps.
-        val consentTask = OrderedTask(CONSENT,
+        val consentTask = OrderedTask(MainActivity.CONSENT,
                 visualStep,
                 documentStep,
                 formStep,
                 signatureStep)
 
         // Launch using hte ViewTaskActivity and make sure to listen for the activity result
-        val intent = ViewTaskActivity.newIntent(this, consentTask)
-        startActivityForResult(intent, REQUEST_CONSENT)
+        val intent = ViewTaskActivity.newIntent(this.activity as Context, consentTask)
+        startActivityForResult(intent, MainActivity.REQUEST_CONSENT)
     }
 
     private fun processConsentResult(result: TaskResult) {
-        val consented = result.getStepResult(CONSENT_DOC).result as Boolean
+        val consented = result.getStepResult(MainActivity.CONSENT_DOC).result as Boolean
 
         if (consented) {
             StorageAccess.getInstance().appDatabase.saveTaskResult(result)
 
-            val prefs = AppPrefs.getInstance(this)
+            val prefs = AppPrefs.getInstance(this.activity as Context)
             prefs.setHasConsented(true)
 
             initViews()
@@ -395,12 +242,12 @@ class MainActivity : AppCompatActivity(), StorageAccessListener, PasscodeAuthent
     private fun printConsentInfo(consentedDate: TextView, consentedSig: ImageView) {
         val result = StorageAccess.getInstance()
                 .appDatabase
-                .loadLatestTaskResult(CONSENT)
+                .loadLatestTaskResult(MainActivity.CONSENT)
 
-        val signatureBase64 = result.getStepResult(SIGNATURE)
+        val signatureBase64 = result.getStepResult(MainActivity.SIGNATURE)
                 .getResultForIdentifier(ConsentSignatureStepLayout.KEY_SIGNATURE) as String
 
-        val signatureDate = result.getStepResult(SIGNATURE)
+        val signatureDate = result.getStepResult(MainActivity.SIGNATURE)
                 .getResultForIdentifier(ConsentSignatureStepLayout.KEY_SIGNATURE_DATE) as String
 
         consentedDate.text = signatureDate
@@ -412,32 +259,31 @@ class MainActivity : AppCompatActivity(), StorageAccessListener, PasscodeAuthent
                 signatureBytes.size))
     }
 
-
     // Survey Stuff
 
     private fun launchSurvey() {
-        val instructionStep = InstructionStep(INSTRUCTION,
+        val instructionStep = InstructionStep(MainActivity.INSTRUCTION,
                 "Selection Survey",
                 "This survey can help us understand your eligibility for the fitness study")
         instructionStep.stepTitle = R.string.survey
 
         val format = TextAnswerFormat()
-        val ageStep = QuestionStep(NAME, "What is your name?", format)
+        val ageStep = QuestionStep(MainActivity.NAME, "What is your name?", format)
         ageStep.stepTitle = R.string.survey
 
         val dateFormat = DateAnswerFormat(AnswerFormat.DateAnswerStyle.Date)
-        val dateStep = QuestionStep(DATE, "Enter a date", dateFormat)
+        val dateStep = QuestionStep(MainActivity.DATE, "Enter a date", dateFormat)
         dateStep.stepTitle = R.string.survey
 
         // Create a Boolean step to include in the task.
-        val booleanStep = QuestionStep(NUTRITION)
+        val booleanStep = QuestionStep(MainActivity.NUTRITION)
         booleanStep.stepTitle = R.string.survey
         booleanStep.title = "Do you take nutritional supplements?"
         booleanStep.answerFormat = BooleanAnswerFormat(getString(R.string.rsf_yes),
                 getString(R.string.rsf_no))
         booleanStep.isOptional = false
 
-        val multiStep = QuestionStep(MULTI_STEP)
+        val multiStep = QuestionStep(MainActivity.MULTI_STEP)
         multiStep.stepTitle = R.string.survey
         val multiFormat = ChoiceAnswerFormat(AnswerFormat.ChoiceAnswerStyle.MultipleChoice,
                 Choice("Zero", 0),
@@ -448,47 +294,47 @@ class MainActivity : AppCompatActivity(), StorageAccessListener, PasscodeAuthent
         multiStep.isOptional = false
 
         // Create a task wrapping the steps.
-        val task = OrderedTask(SAMPLE_SURVEY, instructionStep, ageStep, dateStep,
+        val task = OrderedTask(MainActivity.SAMPLE_SURVEY, instructionStep, ageStep, dateStep,
                 // formStep,
                 booleanStep, multiStep)
 
         // Create an activity using the task and set a delegate.
-        val intent = ViewTaskActivity.newIntent(this, task)
-        startActivityForResult(intent, REQUEST_SURVEY)
+        val intent = ViewTaskActivity.newIntent(this.activity as Context, task)
+        startActivityForResult(intent, MainActivity.REQUEST_SURVEY)
     }
 
     private fun createFormStep(): FormStep {
-        val formStep = FormStep(FORM_STEP, "Form", "Form groups multi-entry in one page")
+        val formStep = FormStep(MainActivity.FORM_STEP, "Form", "Form groups multi-entry in one page")
         val formItems = ArrayList<QuestionStep>()
 
-        val basicInfoHeader = QuestionStep(BASIC_INFO_HEADER,
+        val basicInfoHeader = QuestionStep(MainActivity.BASIC_INFO_HEADER,
                 "Basic Information",
                 UnknownAnswerFormat())
         formItems.add(basicInfoHeader)
 
         val format = TextAnswerFormat()
         format.setIsMultipleLines(false)
-        val nameItem = QuestionStep(FORM_NAME, "Name", format)
+        val nameItem = QuestionStep(MainActivity.FORM_NAME, "Name", format)
         formItems.add(nameItem)
 
-        val ageItem = QuestionStep(FORM_AGE, "Age", IntegerAnswerFormat(18, 90))
+        val ageItem = QuestionStep(MainActivity.FORM_AGE, "Age", IntegerAnswerFormat(18, 90))
         formItems.add(ageItem)
 
         val genderFormat = ChoiceAnswerFormat(AnswerFormat.ChoiceAnswerStyle.SingleChoice,
                 Choice("Male", 0),
                 Choice("Female", 1))
-        val genderFormItem = QuestionStep(FORM_GENDER, "Gender", genderFormat)
+        val genderFormItem = QuestionStep(MainActivity.FORM_GENDER, "Gender", genderFormat)
         formItems.add(genderFormItem)
 
         val multiFormat = ChoiceAnswerFormat(AnswerFormat.ChoiceAnswerStyle.MultipleChoice,
                 Choice("Zero", 0),
                 Choice("One", 1),
                 Choice("Two", 2))
-        val multiFormItem = QuestionStep(FORM_MULTI_CHOICE, "Test Multi", multiFormat)
+        val multiFormItem = QuestionStep(MainActivity.FORM_MULTI_CHOICE, "Test Multi", multiFormat)
         formItems.add(multiFormItem)
 
         val dateOfBirthFormat = DateAnswerFormat(AnswerFormat.DateAnswerStyle.Date)
-        val dateOfBirthFormItem = QuestionStep(FORM_DATE_OF_BIRTH,
+        val dateOfBirthFormItem = QuestionStep(MainActivity.FORM_DATE_OF_BIRTH,
                 "Birthdate",
                 dateOfBirthFormat)
         formItems.add(dateOfBirthFormItem)
@@ -501,7 +347,7 @@ class MainActivity : AppCompatActivity(), StorageAccessListener, PasscodeAuthent
     private fun processSurveyResult(result: TaskResult) {
         StorageAccess.getInstance().appDatabase.saveTaskResult(result)
 
-        val prefs = AppPrefs.getInstance(this)
+        val prefs = AppPrefs.getInstance(this.activity as Context)
         prefs.setHasSurveyed(true)
         initViews()
     }
@@ -509,7 +355,7 @@ class MainActivity : AppCompatActivity(), StorageAccessListener, PasscodeAuthent
     private fun printSurveyInfo(surveyAnswer: TextView) {
         val taskResult = StorageAccess.getInstance()
                 .appDatabase
-                .loadLatestTaskResult(SAMPLE_SURVEY)
+                .loadLatestTaskResult(MainActivity.SAMPLE_SURVEY)
 
         var results = ""
         for (id in taskResult.results.keys) {
