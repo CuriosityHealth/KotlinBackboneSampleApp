@@ -1,8 +1,6 @@
 package org.researchstack.kotlinbackbonesampleapp
 
-import android.app.Activity
 import android.content.Context
-import android.content.Intent
 import android.graphics.BitmapFactory
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
@@ -13,39 +11,21 @@ import android.util.Base64
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import org.researchstack.feature.authentication.pincode.PasscodeAuthenticator
-import org.researchstack.feature.authentication.pincode.step.PassCodeCreationStep
 import org.researchstack.feature.authentication.pincode.ui.PasscodeAuthenticationFragment
 import org.researchstack.feature.storage.StorageAccess
 import org.researchstack.feature.storage.file.StorageAccessListener
-import org.researchstack.foundation.components.common.ui.activities.ViewTaskActivity
-import org.researchstack.feature.consent.model.ConsentDocument
-import org.researchstack.feature.consent.model.ConsentSection
-import org.researchstack.feature.consent.model.ConsentSignature
-import org.researchstack.feature.consent.step.ConsentDocumentStep
-import org.researchstack.feature.consent.step.ConsentSignatureStep
-import org.researchstack.feature.consent.step.ConsentVisualStep
 import org.researchstack.feature.consent.ui.layout.ConsentSignatureStepLayout
-import org.researchstack.foundation.components.survey.answerformat.*
-import org.researchstack.foundation.components.survey.model.Choice
-import org.researchstack.foundation.components.survey.step.FormStep
-import org.researchstack.foundation.components.survey.step.InstructionStep
-import org.researchstack.foundation.components.survey.step.QuestionStep
-import org.researchstack.foundation.components.common.task.OrderedTask
 import org.researchstack.foundation.components.presentation.TaskPresentationCallback
-import org.researchstack.foundation.components.presentation.TaskPresentationFragment
 import org.researchstack.foundation.components.presentation.compatibility.BackwardsCompatibleStepFragmentProvider
 import org.researchstack.foundation.components.presentation.compatibility.BackwardsCompatibleStepLayoutProvider
 import org.researchstack.foundation.components.presentation.compatibility.BackwardsCompatibleTaskPresentationFragment
 import org.researchstack.foundation.components.utils.LogExt
 import org.researchstack.foundation.core.models.result.TaskResult
 import org.researchstack.foundation.core.models.task.Task
-
-import java.util.ArrayList
 
 class MainActivity : AppCompatActivity(), StorageAccessListener, PasscodeAuthenticator.PresentationDelegate {
 
