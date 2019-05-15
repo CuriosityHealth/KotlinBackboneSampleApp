@@ -19,6 +19,8 @@ import org.researchstack.feature.authentication.pincode.ui.PasscodeAuthenticatio
 import org.researchstack.feature.storage.StorageAccess
 import org.researchstack.feature.storage.file.StorageAccessListener
 import org.researchstack.feature.consent.ui.layout.ConsentSignatureStepLayout
+import org.researchstack.foundation.components.presentation.NavigationTaskActionHandler
+import org.researchstack.foundation.components.presentation.TaskActionManager
 import org.researchstack.foundation.components.presentation.TaskPresentationCallback
 import org.researchstack.foundation.components.presentation.compatibility.BackwardsCompatibleStepFragmentProvider
 import org.researchstack.foundation.components.presentation.compatibility.BackwardsCompatibleStepLayoutProvider
@@ -26,6 +28,7 @@ import org.researchstack.foundation.components.presentation.compatibility.Backwa
 import org.researchstack.foundation.components.utils.LogExt
 import org.researchstack.foundation.core.models.result.TaskResult
 import org.researchstack.foundation.core.models.task.Task
+import java.lang.ref.WeakReference
 
 class MainActivity : AppCompatActivity(), StorageAccessListener, PasscodeAuthenticator.PresentationDelegate {
 
@@ -196,6 +199,10 @@ class MainActivity : AppCompatActivity(), StorageAccessListener, PasscodeAuthent
 
         val taskPresentationFragment = BackwardsCompatibleTaskPresentationFragment.newInstance(taskIdentifier, stepFragmentProvider, callback)
         taskPresentationFragment.taskProvider = this.taskProvider
+        val weakDelegate = WeakReference<NavigationTaskActionHandler.PresentationDelegate>(taskPresentationFragment)
+        val navigationTaskActionHandler = NavigationTaskActionHandler(weakDelegate)
+        val actionManager = TaskActionManager(listOf(navigationTaskActionHandler))
+        taskPresentationFragment.actionManager = actionManager
 
         this.taskPresentationFragment = taskPresentationFragment
 
